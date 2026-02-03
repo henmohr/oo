@@ -17,6 +17,7 @@ $history = is_array($meta['history'] ?? null) ? $meta['history'] : [];
 $lastFileTestAt = (string)($meta['lastFileTestAt'] ?? '');
 $lastFileTestOk = (string)($meta['lastFileTestOk'] ?? '');
 $lastFileTestMessage = (string)($meta['lastFileTestMessage'] ?? '');
+$appEnabled = (bool)($meta['appEnabled'] ?? true);
 $outStatusMessage = (string)($outFileStatus['message'] ?? '');
 $outStatusWarn = $outStatusMessage === 'Permission issue';
 ?>
@@ -32,6 +33,7 @@ $outStatusWarn = $outStatusMessage === 'Permission issue';
     <div><strong>Status:</strong> <span id="oo-status-text"><?php p($ok ? 'OK' : 'FAIL'); ?></span></div>
     <div><strong>Message:</strong> <span id="oo-status-message"><?php p($message); ?></span></div>
     <div><strong>Timestamp:</strong> <span id="oo-status-time"><?php p($timestamp); ?></span></div>
+    <div><strong>App:</strong> <span id="oo-app-enabled" class="oo-monitor__badge <?php p($appEnabled ? 'ok' : 'fail'); ?>"><?php p($appEnabled ? 'Habilitado' : 'Desabilitado'); ?></span></div>
     <div><strong>Último check:</strong> <span id="oo-last-check"><?php p($lastCheckAt); ?></span> <span id="oo-last-check-ok"><?php p($lastCheckOk === '' ? '' : ($lastCheckOk === '1' ? '(OK)' : '(FAIL)')); ?></span></div>
     <div><strong>Última reconexão:</strong> <span id="oo-last-reconnect"><?php p($lastReconnectAt); ?></span> <span id="oo-last-reconnect-ok"><?php p($lastReconnectOk === '' ? '' : ($lastReconnectOk === '1' ? '(OK)' : '(FAIL)')); ?></span></div>
     <div><strong>out-oo.txt:</strong> <span id="oo-out-path"><?php p($outFilePath); ?></span></div>
@@ -43,6 +45,7 @@ $outStatusWarn = $outStatusMessage === 'Permission issue';
   <div class="oo-monitor__actions">
     <button id="oo-check" class="button">Check/Reconnect</button>
     <button id="oo-backup" class="button">Fazer backup agora</button>
+    <a class="button" id="oo-download-backup" href="<?php p(\OC::$server->getURLGenerator()->linkToRoute('oo_monitor.status.downloadBackup')); ?>">Baixar backup (JSON)</a>
     <button id="oo-test-file" class="button">Testar acesso ao arquivo</button>
     <span id="oo-check-result"></span>
   </div>
@@ -89,6 +92,7 @@ $outStatusWarn = $outStatusMessage === 'Permission issue';
     var lastCheckOk = document.getElementById('oo-last-check-ok');
     var lastReconnect = document.getElementById('oo-last-reconnect');
     var lastReconnectOk = document.getElementById('oo-last-reconnect-ok');
+    var appEnabled = document.getElementById('oo-app-enabled');
     var outPath = document.getElementById('oo-out-path');
     var outStatus = document.getElementById('oo-out-status');
     var outAlert = document.getElementById('oo-out-alert');
@@ -151,6 +155,10 @@ $outStatusWarn = $outStatusMessage === 'Permission issue';
           }
           if (data.meta && data.meta.history) {
             renderHistory(data.meta.history);
+          }
+          if (data.meta && typeof data.meta.appEnabled !== 'undefined') {
+            appEnabled.textContent = data.meta.appEnabled ? 'Habilitado' : 'Desabilitado';
+            appEnabled.className = 'oo-monitor__badge ' + (data.meta.appEnabled ? 'ok' : 'fail');
           }
         })
         .catch(function (e) {
@@ -243,6 +251,8 @@ $outStatusWarn = $outStatusMessage === 'Permission issue';
           lastCheckOk.textContent = data.meta.lastCheckOk === '1' ? '(OK)' : (data.meta.lastCheckOk === '0' ? '(FAIL)' : '');
           lastReconnect.textContent = data.meta.lastReconnectAt || '';
           lastReconnectOk.textContent = data.meta.lastReconnectOk === '1' ? '(OK)' : (data.meta.lastReconnectOk === '0' ? '(FAIL)' : '');
+          appEnabled.textContent = data.meta.appEnabled ? 'Habilitado' : 'Desabilitado';
+          appEnabled.className = 'oo-monitor__badge ' + (data.meta.appEnabled ? 'ok' : 'fail');
           if (data.meta.lastFileTestAt) {
             filetestBanner.style.display = '';
             filetestMsg.textContent = data.meta.lastFileTestMessage || '';
@@ -273,6 +283,9 @@ $outStatusWarn = $outStatusMessage === 'Permission issue';
   .oo-monitor__field input { padding: 6px 8px; }
   .oo-monitor__alert { margin-top: 8px; padding: 8px; border-left: 4px solid #c46; background: #fff4f6; }
   .oo-monitor__banner { margin: 8px 0; padding: 8px; border-left: 4px solid #4c6; background: #f4fff6; }
+  .oo-monitor__badge { display: inline-block; padding: 2px 6px; border-radius: 999px; font-weight: 600; font-size: 12px; }
+  .oo-monitor__badge.ok { background: #e7f7ed; color: #256a3a; }
+  .oo-monitor__badge.fail { background: #fdebed; color: #9b1c1c; }
   .oo-monitor__history { margin: 12px 0; }
   .oo-monitor__history-row { display: grid; grid-template-columns: 180px 120px 60px 1fr; gap: 8px; padding: 4px 0; }
   .oo-monitor__history-row:nth-child(odd) { background: var(--color-background-hover); }

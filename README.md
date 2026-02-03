@@ -1,5 +1,7 @@
 # oo
 
+
+
 ## Build/Install no Nextcloud
 
 Este repositório já está no formato de app PHP do Nextcloud (não há build de frontend).
@@ -38,3 +40,43 @@ Ajustar intervalo via occ:
 ```
 docker exec -u www-data <container> php occ oo_monitor:set-interval 10
 ```
+
+### Intervalo e verificação de execução
+
+Definir intervalo (minutos):
+- UI: Admin Settings > OO Monitor > “Intervalo do job (minutos)”
+- occ:
+```
+occ oo_monitor:set-interval 10
+```
+
+Verificar se o job está rodando:
+- Leia o último check salvo no app config:
+```
+occ config:app:get oo_monitor last_check_at
+```
+- Forçar uma execução imediata (cron interno):
+```
+php cron.php
+```
+
+### VPS (instalação direta no Nextcloud)
+
+1) Entre na pasta de apps customizadas (ex.: `custom_apps`):
+```
+cd /var/www/nextcloud/custom_apps
+```
+
+2) Clone o app:
+```
+git clone <repo> oo_monitor
+```
+
+3) Habilite o app:
+```
+sudo -u www-data php /var/www/nextcloud/occ app:enable oo_monitor
+```
+
+
+
+![alt text](image.png)

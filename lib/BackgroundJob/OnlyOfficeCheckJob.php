@@ -6,6 +6,7 @@ namespace OCA\OOMonitor\BackgroundJob;
 
 use OCA\OOMonitor\Service\OnlyOfficeMonitor;
 use OCP\IConfig;
+use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
 use Psr\Log\LoggerInterface;
 
@@ -13,8 +14,8 @@ class OnlyOfficeCheckJob extends TimedJob {
     private OnlyOfficeMonitor $monitor;
     private LoggerInterface $logger;
 
-    public function __construct(OnlyOfficeMonitor $monitor, LoggerInterface $logger, IConfig $config) {
-        parent::__construct();
+    public function __construct(ITimeFactory $time, OnlyOfficeMonitor $monitor, LoggerInterface $logger, IConfig $config) {
+        parent::__construct($time);
         $this->monitor = $monitor;
         $this->logger = $logger;
         $interval = (int)$config->getAppValue('oo_monitor', 'check_interval', '900');

@@ -9,5 +9,6 @@ return [
         ['name' => 'status#backup', 'url' => '/backup', 'verb' => 'POST'],
         ['name' => 'status#settings', 'url' => '/settings', 'verb' => 'POST'],
         ['name' => 'status#testFile', 'url' => '/test-file', 'verb' => 'POST'],
+        ['name' => 'status#downloadBackup', 'url' => '/download-backup', 'verb' => 'GET'],
     ],
 ];

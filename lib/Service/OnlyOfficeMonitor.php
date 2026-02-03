@@ -6,6 +6,7 @@ namespace OCA\OOMonitor\Service;
 
 use OCP\Files\IAppData;
 use OCP\IConfig;
+use OCP\App\IAppManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 
@@ -59,11 +60,13 @@ class OnlyOfficeMonitor {
     private IConfig $config;
     private IAppData $appData;
     private LoggerInterface $logger;
+    private IAppManager $appManager;
 
-    public function __construct(IConfig $config, IAppData $appData, LoggerInterface $logger) {
+    public function __construct(IConfig $config, IAppData $appData, LoggerInterface $logger, IAppManager $appManager) {
         $this->config = $config;
         $this->appData = $appData;
         $this->logger = $logger;
+        $this->appManager = $appManager;
     }
 
     public function getStatusMeta(): array {
@@ -71,6 +74,7 @@ class OnlyOfficeMonitor {
         $outStatus = $this->getOutFileStatus($outFile);
 
         return [
+            'appEnabled' => $this->appManager->isEnabledForUser('oo_monitor'),
             'outFilePath' => $outFile ?? '(appdata)',
             'outFileStatus' => $outStatus,
             'intervalMinutes' => $this->getIntervalMinutes(),
@@ -365,11 +369,11 @@ class OnlyOfficeMonitor {
     }
 
     private function getBackupFolder() {
-        if (!$this->appData->folderExists(self::BACKUP_FOLDER)) {
-            $this->appData->newFolder(self::BACKUP_FOLDER);
+        try {
+            return $this->appData->getFolder(self::BACKUP_FOLDER);
+        } catch (\Throwable $e) {
+            return $this->appData->newFolder(self::BACKUP_FOLDER);
         }
-
-        return $this->appData->getFolder(self::BACKUP_FOLDER);
     }
 
     private function getOutFilePath(): ?string {
@@ -557,6 +561,15 @@ class OnlyOfficeMonitor {
         } catch (\Throwable $e) {
             $this->logger->warning('Failed to write history', ['app' => 'oo_monitor', 'exception' => $e]);
         }
+    }
+
+    public function getBackupJson(): string {
+        $backup = $this->loadBackup();
+        if ($backup === null) {
+            $backup = $this->backupConfig();
+        }
+
+        return json_encode($backup, JSON_PRETTY_PRINT);
     }
 
     private function testAppDataWrite(): bool {

@@ -12,7 +12,14 @@
   <dependencies>
     <nextcloud min-version="26" max-version="33"/>
   </dependencies>
+  <background-jobs>
+    <job>OCA\OOMonitor\BackgroundJob\OnlyOfficeCheckJob</job>
+  </background-jobs>
   <commands>
     <command>OCA\OOMonitor\Command\SetIntervalCommand</command>
   </commands>
+  <settings>
+    <admin>OCA\OOMonitor\Settings\Admin</admin>
+    <admin-section>OCA\OOMonitor\Settings\AdminSection</admin-section>
+  </settings>
 </info>

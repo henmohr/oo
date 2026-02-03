@@ -7,6 +7,7 @@ namespace OCA\OOMonitor\Controller;
 use OCA\OOMonitor\Service\OnlyOfficeMonitor;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IRequest;
 
@@ -72,5 +73,14 @@ class StatusController extends Controller {
         $result = $this->monitor->testOutFileAccess();
 
         return new DataResponse($result);
+    }
+
+    /**
+     * @AdminRequired
+     */
+    public function downloadBackup(): DataDownloadResponse {
+        $content = $this->monitor->getBackupJson();
+
+        return new DataDownloadResponse($content, 'onlyoffice_backup.json', 'application/json');
     }
 }
