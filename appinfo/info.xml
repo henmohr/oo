@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<info>
+  <id>oo_monitor</id>
+  <name>OO Monitor</name>
+  <summary>OnlyOffice connection monitor</summary>
+  <description>Basic status page and manual check/reconnect trigger.</description>
+  <version>0.1.0</version>
+  <licence>agpl</licence>
+  <author>Hen</author>
+  <namespace>OOMonitor</namespace>
+  <category>tools</category>
+  <dependencies>
+    <nextcloud min-version="26" max-version="30"/>
+  </dependencies>
+</info>
